@@ -31,6 +31,7 @@ void ledSetup();
 void setBrightness(int bright, int channel);
 void ledsOff();
 void ledsRestore();
+void setButtonsColor();
 
 void savePrefs();
 void restorePrefs();

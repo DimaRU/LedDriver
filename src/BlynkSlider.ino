@@ -59,50 +59,69 @@ BLYNK_WRITE(WhiteSlider)
 BLYNK_WRITE(NightButtonPin)
 {
   int pinValue = param.asInt();
-
   Serial.print("NighButton: ");
   Serial.println(pinValue);
+  if (pinValue != 1) return;
 
-  if (pinValue == 1) {
-    powerState = Night;
-    digitalWrite(NightLedPin, HIGH);
-    Blynk.virtualWrite(OnButtonPin, 0);
-    Blynk.virtualWrite(OffButtonPin, 0);
-    ledsOff();
-  }
+  powerState = Night;
+  digitalWrite(NightLedPin, HIGH);
+  Blynk.virtualWrite(OnButtonPin, 0);
+  Blynk.virtualWrite(OffButtonPin, 0);
+  setButtonsColor();
+  ledsOff();
 }
 
 BLYNK_WRITE(OnButtonPin)
 {
-  int pinValue = param.asInt(); // assigning incoming value from pin V1 to a variable
-
+  int pinValue = param.asInt();
   Serial.print("OnButton: ");
   Serial.println(pinValue);
-
-  if (pinValue == 1) {
-    powerState = On;
-    digitalWrite(NightLedPin, LOW);
-    Blynk.virtualWrite(OffButtonPin, 0);
-    Blynk.virtualWrite(NightButtonPin, 0);
-    ledsRestore();
-  }
+  if (pinValue != 1) return;
+  
+  powerState = On;
+  digitalWrite(NightLedPin, LOW);
+  Blynk.virtualWrite(OffButtonPin, 0);
+  Blynk.virtualWrite(NightButtonPin, 0);
+  setButtonsColor();
+  ledsRestore();
 }
 
 BLYNK_WRITE(OffButtonPin)
 {
- int pinValue = param.asInt(); // assigning incoming value from pin V1 to a variable
-
+ int pinValue = param.asInt();
   Serial.print("OffButtonPin: ");
   Serial.println(pinValue);
+  if (pinValue != 1) return;
   
-  if (pinValue == 1) {
-    powerState = Off;
-    Blynk.virtualWrite(OnButtonPin, 0);
-    Blynk.virtualWrite(NightButtonPin, 0);
-    digitalWrite(NightLedPin, LOW);
-    ledsOff();
+  powerState = Off;
+  digitalWrite(NightLedPin, LOW);
+  Blynk.virtualWrite(OnButtonPin, 0);
+  Blynk.virtualWrite(NightButtonPin, 0);
+  setButtonsColor();
+  ledsOff();
+}
+
+void setButtonsColor()
+{
+  switch(powerState) {
+    case On:
+      Blynk.setProperty(OnButtonPin, "offBackColor", "#ffffff");
+      Blynk.setProperty(OffButtonPin, "offBackColor", "#787878");
+      Blynk.setProperty(NightButtonPin, "offBackColor", "#787878");
+      break;
+    case Off:
+      Blynk.setProperty(OnButtonPin, "offBackColor", "#787878");
+      Blynk.setProperty(OffButtonPin, "offBackColor", "#ffffff");
+      Blynk.setProperty(NightButtonPin, "offBackColor", "#787878");
+      break;
+    case Night:
+      Blynk.setProperty(OnButtonPin, "offBackColor", "#787878");
+      Blynk.setProperty(OffButtonPin, "offBackColor", "#787878");
+      Blynk.setProperty(NightButtonPin, "offBackColor", "#ffffff");
+      break;
   }
 }
+
 
 
 void setup()
@@ -168,7 +187,8 @@ void setup()
 
   Blynk.virtualWrite(YellowSlider, yellowSlider);
   Blynk.virtualWrite(WhiteSlider, whiteSlider);
-
+  setButtonsColor();
+  
   prefsSaveTick = millis() / PrefsSaveTimeout;
 }
 
