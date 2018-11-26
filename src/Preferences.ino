@@ -67,15 +67,15 @@ void restorePrefs() {
 
     if (savedPrefs.magic != PrefsMagic) {
         powerState = On;
-        yellowSlider = LEDC_MAXVALUE;
-        whiteSlider = LEDC_MAXVALUE;
+        yellowSlider = SLIDER_MAXVALUE /2;
+        whiteSlider = SLIDER_MAXVALUE / 2;
     }
 
     powerState = savedPrefs.powerState;
     yellowSlider = savedPrefs.yellowSlider;
     whiteSlider = savedPrefs.whiteSlider;
 
-    digitalWrite(NightLedPin, LOW);
+    nightLedOn(false);
     switch(powerState) {
         case On:
             ledsRestore();
@@ -84,7 +84,7 @@ void restorePrefs() {
             ledsOff();
             break;
         case Night:
-            digitalWrite(NightLedPin, HIGH);
+            nightLedOn(true);
             break;
     }
 }

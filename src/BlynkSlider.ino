@@ -23,10 +23,10 @@ enum LedsPowerState powerState = Off;
 
 BLYNK_CONNECTED(){
   Serial.println("Blynk connected");
-  Blynk.setProperty(YellowSlider, "min", LEDC_MINVALUE);
-  Blynk.setProperty(WhiteSlider, "min", LEDC_MINVALUE);
-  Blynk.setProperty(YellowSlider, "max", LEDC_MAXVALUE);
-  Blynk.setProperty(WhiteSlider, "max", LEDC_MAXVALUE);
+  Blynk.setProperty(YellowSlider, "min", SLIDER_MINVALUE);
+  Blynk.setProperty(WhiteSlider, "min", SLIDER_MINVALUE);
+  Blynk.setProperty(YellowSlider, "max", SLIDER_MAXVALUE);
+  Blynk.setProperty(WhiteSlider, "max", SLIDER_MAXVALUE);
   Blynk.setProperty(OffButtonPin, "offBackColor", "#000000");
   Blynk.setProperty(OffButtonPin, "onBackColor", "#ffffff");
 }
@@ -64,7 +64,7 @@ BLYNK_WRITE(NightButtonPin)
   if (pinValue != 1) return;
 
   powerState = Night;
-  digitalWrite(NightLedPin, HIGH);
+  nightLedOn(true);
   Blynk.virtualWrite(OnButtonPin, 0);
   Blynk.virtualWrite(OffButtonPin, 0);
   setButtonsColor();
@@ -79,7 +79,7 @@ BLYNK_WRITE(OnButtonPin)
   if (pinValue != 1) return;
   
   powerState = On;
-  digitalWrite(NightLedPin, LOW);
+  nightLedOn(false);
   Blynk.virtualWrite(OffButtonPin, 0);
   Blynk.virtualWrite(NightButtonPin, 0);
   setButtonsColor();
@@ -94,7 +94,7 @@ BLYNK_WRITE(OffButtonPin)
   if (pinValue != 1) return;
   
   powerState = Off;
-  digitalWrite(NightLedPin, LOW);
+  nightLedOn(false);
   Blynk.virtualWrite(OnButtonPin, 0);
   Blynk.virtualWrite(NightButtonPin, 0);
   setButtonsColor();
@@ -122,6 +122,15 @@ void setButtonsColor()
   }
 }
 
+void ledsOff() {
+  setBrightness(0, YellowChannel);
+  setBrightness(0, WhiteChannel);
+}
+
+void ledsRestore() {
+  setBrightness(yellowSlider, YellowChannel);
+  setBrightness(whiteSlider, WhiteChannel);
+}
 
 
 void setup()
@@ -140,7 +149,6 @@ void setup()
   // Blynk.begin(blynkAuth, ssid, password);
  
   Blynk.begin(blynkAuth, ssid, password, "userv.bdm", 8080);
-
 
   // Port defaults to 3232
   // ArduinoOTA.setPort(3232);
