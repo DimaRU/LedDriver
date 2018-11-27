@@ -1,8 +1,7 @@
 ////
 ///
 //
-#include "esp_err.h"
-#include "driver/ledc.h"
+
 #include "HardwareDefs.h"
 
 /**
@@ -10,11 +9,9 @@
 * L* = 116(Y/Yn)^1/3 - 16 , Y/Yn > 0.008856
 * L* = 903.3(Y/Yn), Y/Yn <= 0.008856
 */
-
-
 //lookup table for 1024 CIE lab brightness corrected values with 12 bit resolution
-const uint16_t CIEL_10_12[] = {
-  0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 12, 13, 13, 14, 14, 15, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 20, 20, 21,
+const uint16_t CIEL_10_12[1024] = {
+  0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 12, 13, 13, 14, 14, 15, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 20, 20, 21,
   21, 22, 22, 23, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 27, 28, 28, 29, 29, 30, 30, 31, 31, 31, 32, 32, 33, 33, 34, 34, 35, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 39, 40,
   40, 41, 41, 42, 42, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, 48, 49, 49, 50, 50, 51, 51, 52, 52, 53, 54, 54, 55, 55, 56, 56, 57, 58, 58, 59, 59, 60, 61, 61, 62, 63, 63, 64,
   65, 65, 66, 67, 67, 68, 69, 69, 70, 71, 71, 72, 73, 73, 74, 75, 76, 76, 77, 78, 78, 79, 80, 81, 81, 82, 83, 84, 85, 85, 86, 87, 88, 88, 89, 90, 91, 92, 93, 93, 94, 95, 96,
@@ -55,34 +52,54 @@ ledc_timer_config_t ledc_timer = {
     .freq_hz = LEDC_FREQUENCY           // frequency of PWM signal
   };
 
-ledc_channel_config_t yellowChannelConfig = 
+ledc_channel_config_t channel0Config = 
 {
     .gpio_num   = YellowLedPin,
     .speed_mode = LEDC_HIGH_SPEED_MODE,
     .channel    = LEDC_CHANNEL_0,
-    .intr_type  = LEDC_INTR_DISABLE,
+    .intr_type  = LEDC_INTR_FADE_END,
     .timer_sel  = LEDC_TIMER_0,
     .duty       = 0
 };
 
-ledc_channel_config_t whiteChannelConfig = 
+ledc_channel_config_t channel1Config = 
 {
     .gpio_num   = WhiteLedPin,
     .speed_mode = LEDC_HIGH_SPEED_MODE,
     .channel    = LEDC_CHANNEL_1,
-    .intr_type  = LEDC_INTR_DISABLE,
+    .intr_type  = LEDC_INTR_FADE_END,
     .timer_sel  = LEDC_TIMER_0,
     .duty       = 0
 };
+
+volatile ChanBrigthness brigthnessChan0 = {
+  .isFaded = false,
+  .current = 0,
+  .target = 0
+};
+
+volatile ChanBrigthness brigthnessChan1 = {
+  .isFaded = false,
+  .current = 0,
+  .target = 0
+};
+
+void IRAM_ATTR ledc_isr_func(void * arg);
+static void updateDutyChan(volatile ChanBrigthness& brigthness, const ledc_channel_config_t& ledc_conf);
 
 
 void ledSetup() {
   pinMode(NightLedPin, OUTPUT);
 
   ledc_timer_config(&ledc_timer);
-  ledc_channel_config(&yellowChannelConfig);
-  ledc_channel_config(&whiteChannelConfig);
-  ledc_fade_func_install(0);
+  ledc_channel_config(&channel0Config);
+  ledc_channel_config(&channel1Config);
+
+  ledc_fade_func_install(ESP_INTR_FLAG_IRAM|ESP_INTR_FLAG_SHARED);
+  ledc_isr_register(ledc_isr_func, NULL, ESP_INTR_FLAG_IRAM|ESP_INTR_FLAG_SHARED, NULL);
+
+  brigthnessChan0.isFaded = false;
+  brigthnessChan1.isFaded = false;
 }
 
 void nightLedOn(bool on) {
@@ -93,17 +110,57 @@ void nightLedOn(bool on) {
   }
 }
 
+
 void setBrightness(int bright, int channel) {
-  const int duty = CIEL_10_12[bright];
+  // const int duty = CIEL_10_12[bright];
 
   switch(channel) {
     case YellowChannel:
-      ledc_set_duty(yellowChannelConfig.speed_mode, yellowChannelConfig.channel, duty);
-      ledc_update_duty(yellowChannelConfig.speed_mode, yellowChannelConfig.channel);
+      brigthnessChan0.target = bright;
+      // ledc_set_duty(channel0Config.speed_mode, channel0Config.channel, duty);
+      // ledc_update_duty(channel0Config.speed_mode, channel0Config.channel);
       break;
     case WhiteChannel:
-      ledc_set_duty(whiteChannelConfig.speed_mode, whiteChannelConfig.channel, duty);
-      ledc_update_duty(whiteChannelConfig.speed_mode, whiteChannelConfig.channel);
+      brigthnessChan1.target = bright;
+      // ledc_set_duty(channel1Config.speed_mode, channel1Config.channel, duty);
+      // ledc_update_duty(channel1Config.speed_mode, channel1Config.channel);
       break;
   }
+}
+
+
+
+static void updateDutyChan(volatile ChanBrigthness& brigthness, const ledc_channel_config_t& ledc_conf) {
+  if (brigthness.isFaded) return;
+  if (brigthness.current == brigthness.target) return;
+
+  int time = abs(brigthness.target - brigthness.current);
+  if (time == 0) time = 1;
+  const int duty = CIEL_10_12[brigthness.target];
+
+  printf("Brigthness %d->%d %d t=%d\n", brigthness.current, brigthness.target, duty, time);
+  brigthness.isFaded = true;
+  brigthness.current = brigthness.target;
+
+  ledc_set_fade_with_time(ledc_conf.speed_mode, ledc_conf.channel, duty, time);
+  ledc_fade_start(ledc_conf.speed_mode, ledc_conf.channel, LEDC_FADE_NO_WAIT);
+}
+
+void updateDuty() {
+  updateDutyChan(brigthnessChan0, channel0Config);
+  updateDutyChan(brigthnessChan1, channel1Config);
+}
+
+void IRAM_ATTR ledc_isr_func(void * arg) {
+
+    uint32_t intr_status = REG_READ(LEDC_INT_ST_REG);
+
+    if (intr_status & LEDC_DUTY_CHNG_END_HSCH0_INT_ST) {
+        REG_WRITE(LEDC_INT_CLR_REG, LEDC_DUTY_CHNG_END_HSCH0_INT_CLR);
+        brigthnessChan0.isFaded = false;
+    }
+    if (intr_status & LEDC_DUTY_CHNG_END_HSCH1_INT_ST) {
+        REG_WRITE(LEDC_INT_CLR_REG, LEDC_DUTY_CHNG_END_HSCH1_INT_CLR);
+        brigthnessChan1.isFaded = false;
+    }
 }
