@@ -122,14 +122,10 @@ void setBrightness(int bright, int channel) {
     case YellowChannel:
       brigthnessChan0.target = bright;
       vTaskResume(fadeTaskHandle0);
-      // ledc_set_duty(channel0Config.speed_mode, channel0Config.channel, duty);
-      // ledc_update_duty(channel0Config.speed_mode, channel0Config.channel);
       break;
     case WhiteChannel:
       brigthnessChan1.target = bright;
       vTaskResume(fadeTaskHandle1);
-      // ledc_set_duty(channel1Config.speed_mode, channel1Config.channel, duty);
-      // ledc_update_duty(channel1Config.speed_mode, channel1Config.channel);
       break;
   }
 }
@@ -145,7 +141,7 @@ for( ;; ) {
       if (time < 100) time = 100;
       const int duty = CIEL_10_12[fade->target];
 
-      printf("Brigthness %d->%d %d t=%d\n", fade->current, fade->target, duty, time);
+      printf("Brigthness[%d] %d->%d %d t=%d\n",fade->config->channel ,fade->current, fade->target, duty, time);
       fade->current = fade->target;
 
       ledc_set_fade_with_time(fade->config->speed_mode, fade->config->channel, duty, time);
