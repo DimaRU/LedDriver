@@ -1,8 +1,15 @@
 ////
-///
+///  LedcIO.ino - Leds i/o
 //
-
+#include "driver/ledc.h"
+#include "soc/ledc_reg.h"
 #include "HardwareDefs.h"
+
+typedef struct {
+  ledc_channel_config_t* config;
+  int current;
+  int target;
+} ChanBrigthness;
 
 /**
 * 12 bits PWM to CIE Luminance conversion
@@ -72,20 +79,20 @@ ledc_channel_config_t channel1Config =
     .duty       = 0
 };
 
-volatile ChanBrigthness brigthnessChan0 = {
-  .isFaded = false,
+ChanBrigthness brigthnessChan0 = {
+  .config = &channel0Config,
   .current = 0,
   .target = 0
 };
 
-volatile ChanBrigthness brigthnessChan1 = {
-  .isFaded = false,
+ChanBrigthness brigthnessChan1 = {
+  .config = &channel1Config,
   .current = 0,
   .target = 0
 };
 
-void IRAM_ATTR ledc_isr_func(void * arg);
-static void updateDutyChan(volatile ChanBrigthness& brigthness, const ledc_channel_config_t& ledc_conf);
+TaskHandle_t fadeTaskHandle0;
+TaskHandle_t fadeTaskHandle1;
 
 
 void ledSetup() {
@@ -95,11 +102,10 @@ void ledSetup() {
   ledc_channel_config(&channel0Config);
   ledc_channel_config(&channel1Config);
 
-  ledc_fade_func_install(ESP_INTR_FLAG_IRAM|ESP_INTR_FLAG_SHARED);
-  ledc_isr_register(ledc_isr_func, NULL, ESP_INTR_FLAG_IRAM|ESP_INTR_FLAG_SHARED, NULL);
+  ledc_fade_func_install(0);
 
-  brigthnessChan0.isFaded = false;
-  brigthnessChan1.isFaded = false;
+  xTaskCreate(fadeTask, "fadeTask0", 10000, &brigthnessChan0, 2, &fadeTaskHandle0);
+  xTaskCreate(fadeTask, "fadeTask1", 10000, &brigthnessChan1, 2, &fadeTaskHandle1);
 }
 
 void nightLedOn(bool on) {
@@ -112,55 +118,40 @@ void nightLedOn(bool on) {
 
 
 void setBrightness(int bright, int channel) {
-  // const int duty = CIEL_10_12[bright];
-
   switch(channel) {
     case YellowChannel:
       brigthnessChan0.target = bright;
+      vTaskResume(fadeTaskHandle0);
       // ledc_set_duty(channel0Config.speed_mode, channel0Config.channel, duty);
       // ledc_update_duty(channel0Config.speed_mode, channel0Config.channel);
       break;
     case WhiteChannel:
       brigthnessChan1.target = bright;
+      vTaskResume(fadeTaskHandle1);
       // ledc_set_duty(channel1Config.speed_mode, channel1Config.channel, duty);
       // ledc_update_duty(channel1Config.speed_mode, channel1Config.channel);
       break;
   }
 }
 
+void fadeTask( void *pvParameters ) {
+ChanBrigthness* fade = (ChanBrigthness*) pvParameters;
 
+printf("Init fade task chan %d\n", fade->config->channel);
 
-static void updateDutyChan(volatile ChanBrigthness& brigthness, const ledc_channel_config_t& ledc_conf) {
-  if (brigthness.isFaded) return;
-  if (brigthness.current == brigthness.target) return;
+for( ;; ) {
+    while(fade->current != fade->target) {
+      int time = abs(fade->target - fade->current);
+      if (time < 100) time = 100;
+      const int duty = CIEL_10_12[fade->target];
 
-  int time = abs(brigthness.target - brigthness.current);
-  if (time == 0) time = 1;
-  const int duty = CIEL_10_12[brigthness.target];
+      printf("Brigthness %d->%d %d t=%d\n", fade->current, fade->target, duty, time);
+      fade->current = fade->target;
 
-  printf("Brigthness %d->%d %d t=%d\n", brigthness.current, brigthness.target, duty, time);
-  brigthness.isFaded = true;
-  brigthness.current = brigthness.target;
-
-  ledc_set_fade_with_time(ledc_conf.speed_mode, ledc_conf.channel, duty, time);
-  ledc_fade_start(ledc_conf.speed_mode, ledc_conf.channel, LEDC_FADE_NO_WAIT);
-}
-
-void updateDuty() {
-  updateDutyChan(brigthnessChan0, channel0Config);
-  updateDutyChan(brigthnessChan1, channel1Config);
-}
-
-void IRAM_ATTR ledc_isr_func(void * arg) {
-
-    uint32_t intr_status = REG_READ(LEDC_INT_ST_REG);
-
-    if (intr_status & LEDC_DUTY_CHNG_END_HSCH0_INT_ST) {
-        REG_WRITE(LEDC_INT_CLR_REG, LEDC_DUTY_CHNG_END_HSCH0_INT_CLR);
-        brigthnessChan0.isFaded = false;
+      ledc_set_fade_with_time(fade->config->speed_mode, fade->config->channel, duty, time);
+      ledc_fade_start(fade->config->speed_mode, fade->config->channel, LEDC_FADE_WAIT_DONE);
+      printf("duty[%d] = %d\n", fade->config->channel, ledc_get_duty(fade->config->speed_mode, fade->config->channel));
     }
-    if (intr_status & LEDC_DUTY_CHNG_END_HSCH1_INT_ST) {
-        REG_WRITE(LEDC_INT_CLR_REG, LEDC_DUTY_CHNG_END_HSCH1_INT_CLR);
-        brigthnessChan1.isFaded = false;
-    }
+    vTaskSuspend(NULL);
+  }
 }

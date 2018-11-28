@@ -26,12 +26,6 @@ enum LedsPowerState {
   On, Off, Night
 };
 
-typedef struct {
-  bool isFaded;
-  int current;
-  int target;
-} ChanBrigthness;
-
 //extern enum LedsPowerState powerState;
 //extern int yellowSlider;
 //extern int whiteSlider;
@@ -46,5 +40,3 @@ void restorePrefs();
 void ledSetup();
 void setBrightness(int bright, int channel);
 void nightLedOn(bool on);
-void updateDuty();
-

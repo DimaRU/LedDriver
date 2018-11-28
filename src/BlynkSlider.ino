@@ -16,8 +16,8 @@
 //#include <BLEServer.h>
 #include <ArduinoOTA.h>
 #include "esp_err.h"
-#include "driver/ledc.h"
-#include "soc/ledc_reg.h"
+
+
 
 static uint32_t prefsSaveTick;
 int yellowSlider = 0;
@@ -213,5 +213,4 @@ void loop()
     prefsSaveTick = tick;
     savePrefs();
   }
-  updateDuty();
 }
