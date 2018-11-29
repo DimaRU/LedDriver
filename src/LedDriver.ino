@@ -20,10 +20,10 @@
 #include "Credientals.h"
 
 
-static uint32_t prefsSaveTick;
 int yellowLevel = 0;
 int whiteLevel = 0;
 enum LedsPowerState powerState = Off;
+BlynkTimer timer;
 
 static void WiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info);
 
@@ -106,18 +106,14 @@ void setup()
   Blynk.virtualWrite(WhiteSliderPin, whiteLevel);
   setButtonsColor();
   
-  prefsSaveTick = millis() / PrefsSaveTimeout;
+  timer.setInterval(PrefsSaveTimeout, savePrefs);
 }
 
 void loop()
 {
   Blynk.run();
+  timer.run();
   ArduinoOTA.handle();
-  uint32_t tick = millis() / PrefsSaveTimeout;
-  if (tick != prefsSaveTick) {
-    prefsSaveTick = tick;
-    savePrefs();
-  }
 }
 
 
