@@ -3,9 +3,6 @@
 //
 
 
-#include "LedDriver.h"
-#include "Credientals.h"
-
 #define BLYNK_PRINT Serial
 
 #include <WiFi.h>
@@ -15,7 +12,13 @@
 //#include <BLEDevice.h>
 //#include <BLEServer.h>
 #include <ArduinoOTA.h>
+#include "esp_system.h"
 #include "esp_err.h"
+#include "nvs_flash.h"
+
+#include "LedDriver.h"
+#include "Credientals.h"
+
 
 
 
@@ -143,17 +146,14 @@ void setup()
   Serial.begin(115200);
 
   ledSetup();
-
+  
   restorePrefs();
 
-  WiFi.mode(WIFI_STA);
-  //  Blynk.setDeviceName("Blynk");
-
-  // Blynk.begin(blynkAuth);
-  // Blynk.begin(blynkAuth, ssid, password);
+  WiFi.onEvent(WiFiEvent);
  
+  //  Blynk.setDeviceName("Blynk");
   Blynk.begin(blynkAuth, ssid, password, "userv.bdm", 8080);
-
+  
   // Port defaults to 3232
   // ArduinoOTA.setPort(3232);
   // Hostname defaults to esp3232-[MAC]
@@ -212,5 +212,16 @@ void loop()
   if (tick != prefsSaveTick) {
     prefsSaveTick = tick;
     savePrefs();
+  }
+}
+
+
+void WiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+  if (event == SYSTEM_EVENT_STA_DISCONNECTED) {
+    if (info.disconnected.reason == 6) {
+      Serial.println("NOT_AUTHED reconnect");
+      WiFi.reconnect();
+    }
   }
 }
