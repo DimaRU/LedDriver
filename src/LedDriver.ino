@@ -21,11 +21,28 @@
 
 
 static uint32_t prefsSaveTick;
-int yellowSlider = 0;
-int whiteSlider = 0;
+int yellowLevel = 0;
+int whiteLevel = 0;
 enum LedsPowerState powerState = Off;
 
 static void WiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info);
+
+BLYNK_CONNECTED(){
+  Serial.println("Blynk connected");
+  Blynk.setProperty(YellowSliderPin, "min", SLIDER_MINVALUE);
+  Blynk.setProperty(YellowSliderPin, "max", SLIDER_MAXVALUE);
+  Blynk.setProperty(WhiteSliderPin, "min", SLIDER_MINVALUE);
+  Blynk.setProperty(WhiteSliderPin, "max", SLIDER_MAXVALUE);
+
+  Blynk.setProperty(AlarmYellowSliderPin, "min", SLIDER_MINVALUE);
+  Blynk.setProperty(AlarmYellowSliderPin, "max", SLIDER_MAXVALUE);
+  Blynk.setProperty(AlarmWhiteSliderPin, "min", SLIDER_MINVALUE);
+  Blynk.setProperty(AlarmWhiteSliderPin, "max", SLIDER_MAXVALUE);
+
+  Blynk.setProperty(OffButtonPin, "offBackColor", "#000000");
+  Blynk.setProperty(OffButtonPin, "onBackColor", "#ffffff");
+}
+
 
 
 void setup()
@@ -85,8 +102,8 @@ void setup()
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  Blynk.virtualWrite(YellowSlider, yellowSlider);
-  Blynk.virtualWrite(WhiteSlider, whiteSlider);
+  Blynk.virtualWrite(YellowSliderPin, yellowLevel);
+  Blynk.virtualWrite(WhiteSliderPin, whiteLevel);
   setButtonsColor();
   
   prefsSaveTick = millis() / PrefsSaveTimeout;

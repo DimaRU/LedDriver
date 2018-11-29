@@ -1,40 +1,29 @@
 ////
-///  BlunkIO.ino - Blynk I/O
+///  BlynkIO.ino - Blynk I/O
 //
 
 
-BLYNK_CONNECTED(){
-  Serial.println("Blynk connected");
-  Blynk.setProperty(YellowSlider, "min", SLIDER_MINVALUE);
-  Blynk.setProperty(WhiteSlider, "min", SLIDER_MINVALUE);
-  Blynk.setProperty(YellowSlider, "max", SLIDER_MAXVALUE);
-  Blynk.setProperty(WhiteSlider, "max", SLIDER_MAXVALUE);
-  Blynk.setProperty(OffButtonPin, "offBackColor", "#000000");
-  Blynk.setProperty(OffButtonPin, "onBackColor", "#ffffff");
-}
-
-
-BLYNK_WRITE(YellowSlider)
+BLYNK_WRITE(YellowSliderPin)
 {
   int pinValue = param.asInt();
-  if (yellowSlider == pinValue) return;
+  if (yellowLevel == pinValue) return;
 
-  Serial.printf("Yellow: %d->%d\r\n", yellowSlider, pinValue);
-  yellowSlider = pinValue;
+  Serial.printf("Yellow: %d->%d\r\n", yellowLevel, pinValue);
+  yellowLevel = pinValue;
   if (powerState == On) {
-    setBrightness(yellowSlider, YellowChannel);
+    setBrightness(yellowLevel, YellowChannel);
   }
 }
 
-BLYNK_WRITE(WhiteSlider)
+BLYNK_WRITE(WhiteSliderPin)
 {
   int pinValue = param.asInt();
-  if (whiteSlider == pinValue) return;
+  if (whiteLevel == pinValue) return;
 
-  Serial.printf("White: %d->%d\r\n", whiteSlider, pinValue);
-  whiteSlider = pinValue;
+  Serial.printf("White: %d->%d\r\n", whiteLevel, pinValue);
+  whiteLevel = pinValue;
   if (powerState == On) {
-    setBrightness(whiteSlider, WhiteChannel);
+    setBrightness(whiteLevel, WhiteChannel);
   }
 }
 
@@ -110,6 +99,6 @@ void ledsOff() {
 }
 
 void ledsRestore() {
-  setBrightness(yellowSlider, YellowChannel);
-  setBrightness(whiteSlider, WhiteChannel);
+  setBrightness(yellowLevel, YellowChannel);
+  setBrightness(whiteLevel, WhiteChannel);
 }

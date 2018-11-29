@@ -6,9 +6,15 @@
 #define OffButtonPin V0
 #define OnButtonPin V1
 #define NightButtonPin V2
-#define YellowSlider V3
-#define WhiteSlider V4
-#define BrightSlider V5
+#define YellowSliderPin V3
+#define WhiteSliderPin V4
+
+// Alarm clock
+#define AlarmSwitchPin V5
+#define AlaramTimePin V6
+#define RiseTimePin V7
+#define AlarmYellowSliderPin V8
+#define AlarmWhiteSliderPin V9
 
 #define SLIDER_MAXVALUE 1023
 #define SLIDER_MINVALUE 0
@@ -24,9 +30,6 @@ enum LedsPowerState {
   On, Off, Night
 };
 
-//extern enum LedsPowerState powerState;
-//extern int yellowSlider;
-//extern int whiteSlider;
 
 void ledsOff();
 void ledsRestore();

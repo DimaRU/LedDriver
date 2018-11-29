@@ -7,8 +7,8 @@
 
 struct Preferences {
     uint32_t magic;
-    int yellowSlider;
-    int whiteSlider;
+    int yellowLevel;
+    int whiteLevel;
     enum LedsPowerState powerState;
 };
 
@@ -31,8 +31,8 @@ static void writePrefs() {
 }
 
 void savePrefs() {
-    currentPrefs.whiteSlider = whiteSlider;
-    currentPrefs.yellowSlider = yellowSlider;
+    currentPrefs.whiteLevel = whiteLevel;
+    currentPrefs.yellowLevel = yellowLevel;
     currentPrefs.powerState = powerState;
 
     if (memcmp(&currentPrefs, &savedPrefs, sizeof(currentPrefs)) == 0) return;
@@ -67,13 +67,13 @@ void restorePrefs() {
 
     if (savedPrefs.magic != PrefsMagic) {
         powerState = On;
-        yellowSlider = SLIDER_MAXVALUE /2;
-        whiteSlider = SLIDER_MAXVALUE / 2;
+        yellowLevel = SLIDER_MAXVALUE /2;
+        whiteLevel = SLIDER_MAXVALUE / 2;
     }
 
     powerState = savedPrefs.powerState;
-    yellowSlider = savedPrefs.yellowSlider;
-    whiteSlider = savedPrefs.whiteSlider;
+    yellowLevel = savedPrefs.yellowLevel;
+    whiteLevel = savedPrefs.whiteLevel;
 
     nightLedOn(false);
     switch(powerState) {
