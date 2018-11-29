@@ -2,8 +2,6 @@
 /// LedDriver.h - common defs for pproject 
 //
 
-#define TEST_CONFIG
-
 // Screen controls definitions
 #define OffButtonPin V0
 #define OnButtonPin V1
