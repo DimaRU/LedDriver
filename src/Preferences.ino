@@ -10,6 +10,12 @@ struct Preferences {
     int yellowLevel;
     int whiteLevel;
     enum LedsPowerState powerState;
+    int alarmYellowLevel;
+    int alramWhiteLevel;
+    int riseTime;
+    int alarmHour;
+    int alarmMinute;
+    bool alarmEnabled;
 };
 
 static struct Preferences currentPrefs;
@@ -34,6 +40,15 @@ void savePrefs() {
     currentPrefs.whiteLevel = whiteLevel;
     currentPrefs.yellowLevel = yellowLevel;
     currentPrefs.powerState = powerState;
+
+    currentPrefs.alarmYellowLevel = alramWhiteLevel;
+    currentPrefs.alramWhiteLevel = alramWhiteLevel;
+    currentPrefs.riseTime = riseTime;
+    currentPrefs.alarmHour = alarmHour;
+    currentPrefs.alarmMinute = alarmMinute;
+    currentPrefs.alarmEnabled = alarmEnabled;
+
+
 
     if (memcmp(&currentPrefs, &savedPrefs, sizeof(currentPrefs)) == 0) return;
     writePrefs();
@@ -74,6 +89,13 @@ void restorePrefs() {
     powerState = savedPrefs.powerState;
     yellowLevel = savedPrefs.yellowLevel;
     whiteLevel = savedPrefs.whiteLevel;
+
+    alarmYellowLevel = savedPrefs.alarmYellowLevel;
+    alramWhiteLevel = savedPrefs.alramWhiteLevel;
+    riseTime = savedPrefs.riseTime;
+    alarmHour = savedPrefs.alarmHour;
+    alarmMinute = savedPrefs.alarmMinute;
+    alarmEnabled = savedPrefs.alarmEnabled;
 
     nightLedOn(false);
     switch(powerState) {

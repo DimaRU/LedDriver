@@ -12,6 +12,7 @@ BLYNK_WRITE(YellowSliderPin)
   yellowLevel = pinValue;
   if (powerState == On) {
     setBrightness(yellowLevel, YellowChannel);
+    cancelAlarm();
   }
 }
 
@@ -24,6 +25,7 @@ BLYNK_WRITE(WhiteSliderPin)
   whiteLevel = pinValue;
   if (powerState == On) {
     setBrightness(whiteLevel, WhiteChannel);
+    cancelAlarm();
   }
 }
 
@@ -40,6 +42,7 @@ BLYNK_WRITE(NightButtonPin)
   Blynk.virtualWrite(OffButtonPin, 0);
   setButtonsColor();
   ledsOff();
+  cancelAlarm();
 }
 
 BLYNK_WRITE(OnButtonPin)
@@ -70,6 +73,7 @@ BLYNK_WRITE(OffButtonPin)
   Blynk.virtualWrite(NightButtonPin, 0);
   setButtonsColor();
   ledsOff();
+  cancelAlarm();
 }
 
 void setButtonsColor()

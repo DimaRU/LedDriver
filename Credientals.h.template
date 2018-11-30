@@ -1,18 +1,12 @@
 
 
 // Auth Token for Blynk App.
-#ifdef TEST_CONFIG
 const char blynkAuth[] = "--------------------------------";
-#else
-const char blynkAuth[] = "--------------------------------";
-#endif
 
 // WiFi credentials.
 const char ssid[] = "SSID";
 const char password[] = "password";
 
-#ifdef TEST_CONFIG
-const char ModuleHostname[] = "led-test";
-#else
+// OTA hostname
 const char ModuleHostname[] = "led-lamp";
-#endif
+

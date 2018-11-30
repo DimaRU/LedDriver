@@ -15,6 +15,7 @@
 #include "esp_system.h"
 #include "esp_err.h"
 #include "nvs_flash.h"
+#include "apps/sntp/sntp.h"
 
 #include "LedDriver.h"
 #include "Credientals.h"
@@ -105,7 +106,7 @@ void setup()
   Blynk.virtualWrite(YellowSliderPin, yellowLevel);
   Blynk.virtualWrite(WhiteSliderPin, whiteLevel);
   setButtonsColor();
-  
+  initialize_sntp();
   timer.setInterval(PrefsSaveTimeout, savePrefs);
 }
 

@@ -15,6 +15,7 @@
 #define RiseTimePin V7
 #define AlarmYellowSliderPin V8
 #define AlarmWhiteSliderPin V9
+#define AlarmCurrentButtonPin V10
 
 #define SLIDER_MAXVALUE 1023
 #define SLIDER_MINVALUE 0
@@ -22,7 +23,7 @@
 #define YellowChannel 0
 #define WhiteChannel 1
 
-#define PrefsMagic 0x55aa22bbL
+#define PrefsMagic 0x55aa22b2L
 #define PrefsFilePath "/preferences.bin"
 #define PrefsSaveTimeout 10000
 
@@ -41,3 +42,5 @@ void restorePrefs();
 void ledSetup();
 void setBrightness(int bright, int channel);
 void nightLedOn(bool on);
+
+void cancelAlarm();
