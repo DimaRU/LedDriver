@@ -45,8 +45,8 @@ BLYNK_WRITE(AlaramTimePin)
   TimeInputParam t(param);
 
   if (!t.hasStartTime()) return;
-  Serial.println(String("Alaram time: ") +
-                  t.getStartHour() + ":" +
+  printf("Alaram time: %d:%d\n",
+                  t.getStartHour(),
                   t.getStartMinute());
 
   alarmHour = t.getStartHour();
@@ -58,7 +58,7 @@ BLYNK_WRITE(AlaramTimePin)
 BLYNK_WRITE(AlarmSwitchPin)
 {
   bool pinValue = (param.asInt() == 1) ? true : false;
-  Serial.printf("Alarm Switch: %d\n", pinValue);
+  printf("Alarm Switch: %d\n", pinValue);
   alarmEnabled = pinValue;
   if (!alarmEnabled) {
     cancelAlarm();
@@ -68,8 +68,7 @@ BLYNK_WRITE(AlarmSwitchPin)
 BLYNK_WRITE(AlarmCurrentButtonPin)
 {
   int pinValue = param.asInt();
-  Serial.print("CurrentButton: ");
-  Serial.println(pinValue);
+  // Serial.print("CurrentButton: %d\n", pinValue);
   if (pinValue != 1) return;
 
   alarmYellowLevel = yellowLevel;
@@ -144,8 +143,6 @@ static void checkAlarm() {
 
 void initialize_sntp(void)
 {
-  Serial.println("Initializing SNTP");
-  
   sntp_setoperatingmode(SNTP_OPMODE_POLL);
   sntp_setservername(0, "pool.ntp.org");
   sntp_init();

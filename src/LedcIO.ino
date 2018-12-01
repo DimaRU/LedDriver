@@ -141,12 +141,12 @@ for( ;; ) {
       if (time < 100) time = 100;
       const int duty = CIEL_10_12[fade->target];
 
-      printf("Brigthness[%d] %d->%d %d t=%d\n",fade->config->channel ,fade->current, fade->target, duty, time);
+      // printf("Brigthness[%d] %d->%d %d t=%d\n",fade->config->channel ,fade->current, fade->target, duty, time);
       fade->current = fade->target;
 
       ledc_set_fade_with_time(fade->config->speed_mode, fade->config->channel, duty, time);
       ledc_fade_start(fade->config->speed_mode, fade->config->channel, LEDC_FADE_WAIT_DONE);
-      printf("duty[%d] = %d\n", fade->config->channel, ledc_get_duty(fade->config->speed_mode, fade->config->channel));
+      // printf("duty[%d] = %d\n", fade->config->channel, ledc_get_duty(fade->config->speed_mode, fade->config->channel));
     }
     vTaskSuspend(NULL);
   }

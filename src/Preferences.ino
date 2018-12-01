@@ -74,9 +74,7 @@ void restorePrefs() {
         return;
     }
 
-    if ( file.read((uint8_t *)&savedPrefs, sizeof(savedPrefs)) ) {
-        Serial.println("- file read");
-    } else {
+    if ( !file.read((uint8_t *)&savedPrefs, sizeof(savedPrefs)) ) {
         Serial.println("- read failed");
     }
 

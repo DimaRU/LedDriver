@@ -2,8 +2,9 @@
 /// LedDriver - main file.
 //
 
-
-#define BLYNK_PRINT Serial
+#ifdef TEST_CONFIG
+  #define BLYNK_PRINT Serial
+#endif
 
 #include <WiFi.h>
 #include <WiFiClient.h>
@@ -99,10 +100,6 @@ void setup()
     });
 
   ArduinoOTA.begin();
-
-  Serial.println("Ready");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
 
   Blynk.virtualWrite(YellowSliderPin, yellowLevel);
   Blynk.virtualWrite(WhiteSliderPin, whiteLevel);
