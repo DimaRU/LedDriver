@@ -69,7 +69,7 @@ BLYNK_WRITE(AlarmCurrentButtonPin)
 {
   int pinValue = param.asInt();
   // Serial.print("CurrentButton: %d\n", pinValue);
-  if (pinValue != 1) return;
+  if (pinValue != BunttonTapState) return;
 
   alarmYellowLevel = yellowLevel;
   alramWhiteLevel = whiteLevel;

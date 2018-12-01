@@ -33,7 +33,7 @@ BLYNK_WRITE(NightButtonPin)
 {
   int pinValue = param.asInt();
   // Serial.print("NighButton: %d\n", pinValue);
-  if (pinValue != 1) return;
+  if (pinValue != BunttonTapState) return;
 
   powerState = Night;
   nightLedOn(true);
@@ -48,7 +48,7 @@ BLYNK_WRITE(OnButtonPin)
 {
   int pinValue = param.asInt();
   // Serial.print("OnButton: %d\n", pinValue);
-  if (pinValue != 1) return;
+  if (pinValue != BunttonTapState) return;
   
   powerState = On;
   nightLedOn(false);
@@ -62,7 +62,7 @@ BLYNK_WRITE(OffButtonPin)
 {
  int pinValue = param.asInt();
   // Serial.print("OffButton: %d\n", pinValue);
-  if (pinValue != 1) return;
+  if (pinValue != BunttonTapState) return;
   
   powerState = Off;
   nightLedOn(false);

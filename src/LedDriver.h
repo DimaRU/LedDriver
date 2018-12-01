@@ -27,6 +27,8 @@
 #define PrefsFilePath "/preferences.bin"
 #define PrefsSaveTimeout 10000
 
+#define BunttonTapState 0
+
 enum LedsPowerState {
   On, Off, Night
 };
