@@ -51,6 +51,8 @@ BLYNK_WRITE(AlaramTimePin)
 
   alarmHour = t.getStartHour();
   alarmMinute = t.getStartMinute();
+
+  alarmState = waiting;
 }
 
 BLYNK_WRITE(AlarmSwitchPin)
@@ -88,8 +90,10 @@ static void alarm() {
   startTime = time(NULL);
   endTime = startTime + riseTime * 60;
   printf("Alarm interval %ld - %ld, riseTime %d\n", startTime, endTime, riseTime);
+
   powerState = On;
   nightLedOn(false);
+  setButtonsColor();
 }
 
 static void adjustBrightness(time_t now) {

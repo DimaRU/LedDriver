@@ -21,9 +21,10 @@
 #include "Credientals.h"
 
 
-int yellowLevel = 0;
-int whiteLevel = 0;
-enum LedsPowerState powerState = Off;
+int yellowLevel = SLIDER_MAXVALUE /2;
+int whiteLevel = SLIDER_MAXVALUE /2;
+enum LedsPowerState powerState = On;
+
 BlynkTimer timer;
 
 static void WiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info);

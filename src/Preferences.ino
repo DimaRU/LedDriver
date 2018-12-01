@@ -80,23 +80,18 @@ void restorePrefs() {
         Serial.println("- read failed");
     }
 
-    if (savedPrefs.magic != PrefsMagic) {
-        powerState = On;
-        yellowLevel = SLIDER_MAXVALUE /2;
-        whiteLevel = SLIDER_MAXVALUE / 2;
+    if (savedPrefs.magic == PrefsMagic) {
+        powerState = savedPrefs.powerState;
+        yellowLevel = savedPrefs.yellowLevel;
+        whiteLevel = savedPrefs.whiteLevel;
+
+        alarmYellowLevel = savedPrefs.alarmYellowLevel;
+        alramWhiteLevel = savedPrefs.alramWhiteLevel;
+        riseTime = savedPrefs.riseTime;
+        alarmHour = savedPrefs.alarmHour;
+        alarmMinute = savedPrefs.alarmMinute;
+        alarmEnabled = savedPrefs.alarmEnabled;
     }
-
-    powerState = savedPrefs.powerState;
-    yellowLevel = savedPrefs.yellowLevel;
-    whiteLevel = savedPrefs.whiteLevel;
-
-    alarmYellowLevel = savedPrefs.alarmYellowLevel;
-    alramWhiteLevel = savedPrefs.alramWhiteLevel;
-    riseTime = savedPrefs.riseTime;
-    alarmHour = savedPrefs.alarmHour;
-    alarmMinute = savedPrefs.alarmMinute;
-    alarmEnabled = savedPrefs.alarmEnabled;
-
     nightLedOn(false);
     switch(powerState) {
         case On:
