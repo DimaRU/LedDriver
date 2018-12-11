@@ -41,7 +41,7 @@ void savePrefs() {
     currentPrefs.yellowLevel = yellowLevel;
     currentPrefs.powerState = powerState;
 
-    currentPrefs.alarmYellowLevel = alramWhiteLevel;
+    currentPrefs.alarmYellowLevel = alarmYellowLevel;
     currentPrefs.alramWhiteLevel = alramWhiteLevel;
     currentPrefs.riseTime = riseTime;
     currentPrefs.alarmHour = alarmHour;
@@ -89,6 +89,17 @@ void restorePrefs() {
         alarmHour = savedPrefs.alarmHour;
         alarmMinute = savedPrefs.alarmMinute;
         alarmEnabled = savedPrefs.alarmEnabled;
+    } else {
+        yellowLevel = SLIDER_MAXVALUE /2;
+        whiteLevel = SLIDER_MAXVALUE /2;
+        powerState = On;
+
+        alarmYellowLevel = SLIDER_MAXVALUE/4;
+        alramWhiteLevel = SLIDER_MAXVALUE/4;
+        riseTime = 15;
+        alarmHour = 7;
+        alarmMinute = 0;
+        alarmEnabled = false;
     }
     nightLedOn(false);
     switch(powerState) {
