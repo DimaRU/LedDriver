@@ -8,7 +8,6 @@ BLYNK_WRITE(YellowSliderPin)
   int pinValue = param.asInt();
   if (yellowLevel == pinValue) return;
 
-  // Serial.printf("Yellow: %d->%d\r\n", yellowLevel, pinValue);
   yellowLevel = pinValue;
   if (powerState == On) {
     setBrightness(yellowLevel, YellowChannel);
@@ -21,7 +20,6 @@ BLYNK_WRITE(WhiteSliderPin)
   int pinValue = param.asInt();
   if (whiteLevel == pinValue) return;
 
-  // Serial.printf("White: %d->%d\r\n", whiteLevel, pinValue);
   whiteLevel = pinValue;
   if (powerState == On) {
     setBrightness(whiteLevel, WhiteChannel);
@@ -32,7 +30,6 @@ BLYNK_WRITE(WhiteSliderPin)
 BLYNK_WRITE(NightButtonPin)
 {
   int pinValue = param.asInt();
-  // Serial.print("NighButton: %d\n", pinValue);
   if (pinValue != BunttonTapState) return;
 
   powerState = Night;
@@ -47,7 +44,6 @@ BLYNK_WRITE(NightButtonPin)
 BLYNK_WRITE(OnButtonPin)
 {
   int pinValue = param.asInt();
-  // Serial.print("OnButton: %d\n", pinValue);
   if (pinValue != BunttonTapState) return;
   
   powerState = On;
@@ -61,7 +57,6 @@ BLYNK_WRITE(OnButtonPin)
 BLYNK_WRITE(OffButtonPin)
 {
  int pinValue = param.asInt();
-  // Serial.print("OffButton: %d\n", pinValue);
   if (pinValue != BunttonTapState) return;
   
   powerState = Off;
@@ -72,6 +67,32 @@ BLYNK_WRITE(OffButtonPin)
   ledsOff();
   cancelAlarm();
 }
+
+BLYNK_WRITE(SegmentedButtonPin)
+{
+ int pinValue = param.asInt();
+
+  switch(pinValue) {
+    case 1:
+      powerState = Off;
+      nightLedOn(false);
+      ledsOff();
+      cancelAlarm();
+      break;
+    case 2:
+      powerState = On;
+      nightLedOn(false);
+      ledsRestore();
+      break;
+    case 3:
+      powerState = Night;
+      nightLedOn(true);
+      ledsOff();
+      cancelAlarm();
+      break;
+  }  
+}
+
 
 void setButtonsColor()
 {

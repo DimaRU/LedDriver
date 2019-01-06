@@ -8,6 +8,7 @@
 #define NightButtonPin V2
 #define YellowSliderPin V3
 #define WhiteSliderPin V4
+#define SegmentedButtonPin V11
 
 // Alarm clock
 #define AlarmSwitchPin V5

@@ -60,8 +60,12 @@ void setup()
   WiFi.onEvent(WiFiEvent);
  
   //  Blynk.setDeviceName("Blynk");
-  Blynk.begin(blynkAuth, ssid, password, "userv.bdm", 8080);
-  
+#ifdef BLYNK_LOCAL_SERVER
+  Blynk.begin(blynkAuth, ssid, password, BLYNK_LOCAL_SERVER, 8080);
+#else
+  Blynk.begin(blynkAuth, ssid, password);
+#endif
+
   // Port defaults to 3232
   // ArduinoOTA.setPort(3232);
   // Hostname defaults to esp3232-[MAC]
