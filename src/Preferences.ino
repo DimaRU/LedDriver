@@ -16,6 +16,7 @@ struct Preferences {
     int alarmHour;
     int alarmMinute;
     bool alarmEnabled;
+    long gmtOffsetSec;
 };
 
 static struct Preferences currentPrefs;
@@ -47,8 +48,7 @@ void savePrefs() {
     currentPrefs.alarmHour = alarmHour;
     currentPrefs.alarmMinute = alarmMinute;
     currentPrefs.alarmEnabled = alarmEnabled;
-
-
+    currentPrefs.gmtOffsetSec = gmtOffsetSec;
 
     if (memcmp(&currentPrefs, &savedPrefs, sizeof(currentPrefs)) == 0) return;
     writePrefs();
@@ -89,6 +89,7 @@ void restorePrefs() {
         alarmHour = savedPrefs.alarmHour;
         alarmMinute = savedPrefs.alarmMinute;
         alarmEnabled = savedPrefs.alarmEnabled;
+        gmtOffsetSec = savedPrefs.gmtOffsetSec;
     } else {
         yellowLevel = SLIDER_MAXVALUE /2;
         whiteLevel = SLIDER_MAXVALUE /2;
@@ -100,6 +101,7 @@ void restorePrefs() {
         alarmHour = 7;
         alarmMinute = 0;
         alarmEnabled = false;
+        gmtOffsetSec = 10800L;
     }
     nightLedOn(false);
     switch(powerState) {

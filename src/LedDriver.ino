@@ -61,7 +61,7 @@ void setup()
  
   //  Blynk.setDeviceName("Blynk");
 #ifdef BLYNK_LOCAL_SERVER
-  Blynk.begin(blynkAuth, ssid, password, BLYNK_LOCAL_SERVER, 8080);
+  Blynk.begin(blynkAuth, ssid, password, "userv.bdm", 8080);
 #else
   Blynk.begin(blynkAuth, ssid, password);
 #endif
@@ -108,7 +108,7 @@ void setup()
   Blynk.virtualWrite(YellowSliderPin, yellowLevel);
   Blynk.virtualWrite(WhiteSliderPin, whiteLevel);
   setButtonsColor();
-  initialize_sntp();
+  initialize_alaram();
   timer.setInterval(PrefsSaveTimeout, savePrefs);
 }
 

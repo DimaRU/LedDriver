@@ -16,6 +16,7 @@ int riseTime = 15;
 int alarmHour = 7;
 int alarmMinute = 0;
 bool alarmEnabled = false;
+long gmtOffsetSec = 10800;
 
 time_t startTime;
 time_t endTime;
@@ -45,14 +46,21 @@ BLYNK_WRITE(AlaramTimePin)
   TimeInputParam t(param);
 
   if (!t.hasStartTime()) return;
-  printf("Alaram time: %d:%d\n",
+  printf("Alaram time: %d:%d %s %d\n",
                   t.getStartHour(),
-                  t.getStartMinute());
-
-  alarmHour = t.getStartHour();
-  alarmMinute = t.getStartMinute();
+                  t.getStartMinute(),
+                  t.getTZ(),
+                  t.getTZ_Offset()
+                  );
 
   alarmState = waiting;
+  alarmHour = t.getStartHour();
+  alarmMinute = t.getStartMinute();
+  long offset = t.getTZ_Offset();
+  if (offset != gmtOffsetSec) {
+    gmtOffsetSec = offset;
+    initialize_sntp();
+  }
 }
 
 BLYNK_WRITE(AlarmSwitchPin)
@@ -141,13 +149,13 @@ static void checkAlarm() {
   }
 }
 
+void initialize_alaram(void) {
+  initialize_sntp();
+  timer.setInterval(1000L, checkAlarm);
+}
+
+
 void initialize_sntp(void)
 {
-  sntp_setoperatingmode(SNTP_OPMODE_POLL);
-  sntp_setservername(0, "pool.ntp.org");
-  sntp_init();
-  setenv("TZ", "MSK-3", 1);
-  tzset();
-
-  timer.setInterval(1000L, checkAlarm);
+  configTime(gmtOffsetSec, 0, "pool.ntp.org", NULL, NULL);
 }
