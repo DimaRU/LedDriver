@@ -18,13 +18,16 @@
 #define AlarmWhiteSliderPin V9
 #define AlarmCurrentButtonPin V10
 
+// Stats
+#define RebootCountPin V12
+
 #define SLIDER_MAXVALUE 1023
 #define SLIDER_MINVALUE 0
 
 #define YellowChannel 0
 #define WhiteChannel 1
 
-#define PrefsMagic 0x55aa22b2L
+#define PrefsMagic 0x55aa22b3L
 #define PrefsFilePath "/preferences.bin"
 #define PrefsSaveTimeout 10000
 

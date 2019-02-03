@@ -25,6 +25,7 @@
 int yellowLevel = SLIDER_MAXVALUE /2;
 int whiteLevel = SLIDER_MAXVALUE /2;
 enum LedsPowerState powerState = On;
+int rebootCounter = 0;
 
 BlynkTimer timer;
 
@@ -107,6 +108,9 @@ void setup()
 
   Blynk.virtualWrite(YellowSliderPin, yellowLevel);
   Blynk.virtualWrite(WhiteSliderPin, whiteLevel);
+  Blynk.virtualWrite(RebootCountPin, rebootCounter);
+
+
   setButtonsColor();
   initialize_alaram();
   timer.setInterval(PrefsSaveTimeout, savePrefs);

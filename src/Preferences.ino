@@ -7,6 +7,7 @@
 
 struct Preferences {
     uint32_t magic;
+    int rebootCounter;
     int yellowLevel;
     int whiteLevel;
     enum LedsPowerState powerState;
@@ -38,6 +39,7 @@ static void writePrefs() {
 }
 
 void savePrefs() {
+    currentPrefs.rebootCounter = rebootCounter;
     currentPrefs.whiteLevel = whiteLevel;
     currentPrefs.yellowLevel = yellowLevel;
     currentPrefs.powerState = powerState;
@@ -79,6 +81,7 @@ void restorePrefs() {
     }
 
     if (savedPrefs.magic == PrefsMagic) {
+        rebootCounter = savedPrefs.rebootCounter + 1;
         powerState = savedPrefs.powerState;
         yellowLevel = savedPrefs.yellowLevel;
         whiteLevel = savedPrefs.whiteLevel;
@@ -91,6 +94,7 @@ void restorePrefs() {
         alarmEnabled = savedPrefs.alarmEnabled;
         gmtOffsetSec = savedPrefs.gmtOffsetSec;
     } else {
+        rebootCounter = 0;
         yellowLevel = SLIDER_MAXVALUE /2;
         whiteLevel = SLIDER_MAXVALUE /2;
         powerState = On;
